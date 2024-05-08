@@ -1,0 +1,24 @@
+[project]
+name = "p4-command-controller"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Wang Xinyu", email = "hi_wangxinyu@163.com"},
+]
+dependencies = [
+    "typing-extensions>=4.11.0",
+    "fabric>=3.2.2",
+    "invoke>=2.2.0",
+    "netaddr>=1.2.1",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[build-system]
+requires = ["flit_core>=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+
+[tool.pdm]
+distribution = true
