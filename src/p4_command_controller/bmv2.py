@@ -8,7 +8,7 @@ import typing_extensions as typing
 import invoke
 import logging
 
-from p4_command_controller.p4_switch import P4Switch
+from p4_command_controller.p4_switch import P4Switch,table_entry_params
 
 class _CommandIO(typing.TextIO):
     """
@@ -117,7 +117,7 @@ class SimpleSwitchHandle(P4Switch):
             return self.send_cmd(f"register_write {name} {index} {value}")
         
     @typing.override
-    def update_table_entry(self, table: str, match_params: typing.Mapping[str, IPAddress | EUI | IPNetwork |int], action: str, action_params: typing.Mapping[str, IPAddress |IPNetwork| EUI | int] = {}):
+    def update_table_entry(self, table: str, match_params: table_entry_params, action: str, action_params: table_entry_params = {}):
         match_s = " ".join(str(i) for i in match_params.values())
         action_params_s = " ".join(str(i) for i in action_params.values())
         self.send_cmd(f"table_add {table} {action} {match_s} => {action_params_s}")

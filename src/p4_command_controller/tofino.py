@@ -5,11 +5,10 @@ import uuid
 import logging
 import typing
 from datetime import datetime
-
-from netaddr import EUI, IPAddress, IPNetwork
+from ipaddress import IPv4Address,IPv4Network
 
 from p4_command_controller.p4_switch import P4Switch, table_entry_params
-
+from p4_command_controller.mac_address import MacAddress
 
 SDE=PurePosixPath("/root/bf-sde-9.1.0")
 SDE_INSTALL=SDE/'install'
@@ -21,21 +20,22 @@ tofino_env={str(k):str(v) for k,v in dict(SDE=SDE,SDE_INSTALL=SDE_INSTALL)}
 def _entry_params_to_string(x:table_entry_params) -> str:
     r = []
     for k,v in x.items():
-        if isinstance(v,(EUI,IPAddress)):
-            if v.value:
-                r.append(f"{k}={hex(v.value)}")
-            raise Exception("空的ip地址对象")
-        elif isinstance(v,IPNetwork):
-            if v.ip.value:
-                r.append(f"{k}={v.ip.value},\n{k}_p_length={v.prefixlen}")
-            raise Exception("空的ip地址对象")
+        if isinstance(v,IPv4Network):
+            code=f"{k}={hex(int(v.network_address))},\n{k}_p_length={v.prefixlen}"
+        else:
+            if isinstance(v,IPv4Address):
+                v=hex(int(v))
+            elif isinstance(v,MacAddress):
+                v=hex(v.value)
+            code=f"{k}={v}"
+        r.append(code)
     return ',\n'.join(r)
 
 def _make_code(
         table: str, 
-        match_params: typing.Mapping[str, IPAddress | IPNetwork | EUI | int], 
+        match_params: table_entry_params, 
         action: str, 
-        action_params: typing.Mapping[str, IPAddress | IPNetwork | EUI | int] = {}
+        action_params: table_entry_params = {}
     ) -> str:
     match_s = _entry_params_to_string(match_params)
     code = f"""
@@ -84,10 +84,10 @@ class Tofino(P4Switch):
 
     def update_table_entry(self, 
                            table: str, 
-                           match_params: typing.Mapping[str, IPAddress | IPNetwork | EUI | int], 
+                           match_params: table_entry_params, 
                            action: str, 
-                           action_params: typing.Mapping[str, IPAddress | IPNetwork | EUI | int] = {}
-                           ) -> None:
+                           action_params: table_entry_params = {}
+                          ) -> None:
         code=_make_code(table,match_params,action,action_params)
         self.send_code(code)
 

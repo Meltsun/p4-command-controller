@@ -1,10 +1,12 @@
 import abc
 import typing
 from abc import ABC
-from netaddr import IPAddress,EUI,IPNetwork
+from ipaddress import IPv4Address,IPv4Network
 from functools import partial
 
-table_entry_params:typing.TypeAlias = typing.Mapping[str,IPAddress|IPNetwork|EUI|int]
+from p4_command_controller.mac_address import MacAddress
+
+table_entry_params:typing.TypeAlias = typing.Mapping[str,IPv4Address|IPv4Network|MacAddress|int]
 
 class Register:
     def __init__(self,reset_func:typing.Callable[[],object],set_func:typing.Callable[[int],object]) -> None:
