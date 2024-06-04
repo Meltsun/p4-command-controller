@@ -106,7 +106,7 @@ class SimpleSwitchHandle(P4Switch):
         return self.stdout.getvalue()
     
     @typing.override
-    def reset_register(self, name: str, *, index: int | None = None):
+    def reset_register(self, name: str):
         return self.send_cmd(f"register_reset {name}")
 
     @typing.override
